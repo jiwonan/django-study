@@ -3,12 +3,13 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.parsers import JSONParser
+from rest_framework.decorators import api_view
 from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer
 
 
-@csrf_exempt
-def snippet_list(request):
+@api_view(['GET', 'POST'])
+def snippet_list(request, format=None):
     if request.method == 'GET':
         snippets = Snippet.objects.all()
         serializer = SnippetSerializer(snippets, many=True)
@@ -22,8 +23,8 @@ def snippet_list(request):
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@csrf_exempt
-def snippet_detail(request, pk):
+@api_view(['GET', 'PUT', 'DELETE'])
+def snippet_detail(request, pk, format=None):
     try:
         snippet = Snippet.objects.get(pk=pk)
     except Snippet.DoesNotExist:
